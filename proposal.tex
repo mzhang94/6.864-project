@@ -41,14 +41,33 @@
     We propose, for this project, to build a system that automatically produces these graphs, which we call \emph{character graphs}, given the text for a work of literature. While literary scholars frequently hypothesize trends in literature by performing a small scale analysis of different works manageable through close reading and manual annotation, having a system that can automatically visualize these character relationships can help with exploring trends across a large number of novels.
 
 \section{Methods}
+\subsection{Problem Formulation}
+    To be more precise about the problem, for each novel, we will extract a list of major characters in the novel. We will have some
+    predefined labels to describe roles of characters, like ``protagonist'' and ``antagonist'', and some predefined labels to describe relationships between two characters,
+    like ``father-daughter'' or ``love-love''. The relationship labels could be a pair of nouns or verbs. This way, we can view character extraction as a name entity recognition (NER) problem,
+    and character roles and relationships extraction as a classification problem.
+
 \subsection{Data Collection}
+    We found no well formatted data that labels character roles and relationships in a way that we can directly use as annotated training data.
+    To avoid manual annotation, we plan to write a simple extrator that automatically extracts character roles and relationships from
+    descriptions of fictions on Sparknote. We expect that this will not be difficult to do because the information on Sparknote is very
+    well formatted and concise. For each novel, Sparknote provides a list of major characters and a short description for each major
+    character. Character roles and relationships are usually summarized in the first few sentences of the description. For example,
+    for the novel ``The Great Gatsby'', the description of character Jay Gatsby begins with ``Jay Gatsby -  The title character and protagonist of the novel''
+    and the description of Daisy Buchanan begins with ``Daisy Buchanan - Nick's cousin, and the woman Gatsby loves''.
+
+    The list of major characters can be obtained directly by parsing the html of the webpage. We restrict roles of characters to a fixed set which contains
+    protagonist, antagonist, sidekick, tempter, etc. We will simply look for these words in character descriptions. To extract the relationships between characters,
+    we will look for sentences where names of both characters appear and extract the verb or noun of that sentence. We will then manually look at the words we extract
+    and pick some to form the set of labels to describe relationships between characters.
 \subsection{Baseline}
+
 \subsection{Our Approach}
     Our proposed system takes the form of a pipeline of subsystems that extract character references from the text, determine semantic representations of them, and then classify their literary roles and relationships from this semantic representation. The pipeline is visualized below: \\
-    
+
     [Insert Pipeline Graphic] \\
 
-    The neural networks we train, for extracting semantic character representations (\emph{character vectors}) and classifying literary relationships, are also visualized separately for clarity: \\ 
+    The neural networks we train, for extracting semantic character representations (\emph{character vectors}) and classifying literary relationships, are also visualized separately for clarity: \\
 
     [Begin figure of neural networks] \\
 
@@ -58,9 +77,10 @@
 
     Given output from the first network, the other two networks are similar to many current classification networks using word vectors as input. We feed in a singlet or pair of characters, and then obtain an output label corresponding to their literary role or relationship. To keep learning feasible, we restrict to a small subset of major literary role and prominent relationship labels. Since the training is done over all novels, we believe we will have enough data to perform adequate learning. \\
 
-    After we have passed the characters through the last two networks, we then have labels for each character and a list of labeled 2-character relationships. As described in the introduction, these labels then induce a graph structure that we can visualize. 
+    After we have passed the characters through the last two networks, we then have labels for each character and a list of labeled 2-character relationships. As described in the introduction, these labels then induce a graph structure that we can visualize.
 
 \subsection{Result Measuring}
 \section{Milestones}
+    We plan to finish data collection before November 14, 2015, baseline before November 21, implementation of our approach before December 1, final report before December 11.
 
 \end{document}
