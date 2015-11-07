@@ -45,8 +45,26 @@
     We propose, for this project, to build a system that automatically produces these graphs, which we call \emph{character graphs}, given the text for a work of literature. While literary scholars frequently hypothesize trends in literature by performing a small scale analysis of different works manageable through close reading and manual annotation, having a system that can automatically visualize these character relationships can help with exploring trends across a large number of novels.
 
 \section{Methods}
+\subsection{Problem Formulation}
+    To be more precise about the problem, for each novel, we will extract a list of major characters in the novel. We will have a fixed, small number of  
+    predefined labels to describe roles and relationships of characters, like ``protagonist'', and ``father-daughter''.  
+    In this way, we can view character extraction as a name entity recognition (NER) problem,
+    and character role and relationship extraction as classification problems.
+
 \subsection{Data Collection}
+    We found no formatted data that explicitly labels character roles and relationships that can be used for training.
+    To avoid manual annotation, we plan to write a simple extractor that automatically extracts character roles and relationships from
+    descriptions of fictions on Sparknotes. We expect that this will not be difficult because the information on Sparknotes is 
+    well formatted and concise. For each novel, Sparknotes provides a list of major characters and a short description for each major
+    character. Character roles and relationships are usually summarized in the first few sentences of the description. For example,
+    for the novel ``The Great Gatsby'', the description of character Jay Gatsby begins with ``Jay Gatsby -  The title character and protagonist of the novel''
+    and the description of Daisy Buchanan begins with ``Daisy Buchanan - Nick's cousin, and the woman Gatsby loves''. \\
+
+    The list of major characters can be obtained directly by parsing the HTML of the webpage.
+    To extract roles, we look for fixed role labels in character descriptions. To extract relationships between characters, we look for sentences where names of both characters appear and extract the verb or noun of that sentence, then match those to our fixed relation labels. 
+
 \subsection{Baseline}
+
 \subsection{Our Approach}
     Our proposed system takes the form of a pipeline of subsystems that extract character references from the text, determine semantic representations of them, and then classify their literary roles and relationships from this semantic representation. The pipeline is visualized below: 
     
@@ -56,7 +74,7 @@
         \caption{The pipeline for the character graph extraction system. \textbf{Note}: the input to preprocessing is the full text, and the output is a list of contexts for \emph{each} possible character. All are used to train the character network.} 
     \end{figure}
 
-    The neural networks we train, for extracting semantic character representations (\emph{character vectors}) and classifying literary relationships, are also visualized separately for clarity: \\ 
+    The neural networks we train, for extracting semantic character representations (\emph{character vectors}) and classifying literary relationships, are also visualized separately for clarity: \\
 
     \begin{figure}[H]
         \centering
@@ -67,18 +85,20 @@
 \subsubsection{Preprocessing}
     Examining the pipeline, we note that the data required for the neural network to train character vectors is a representation of a context for the character. If the character vectors are to be semantically meaningful, it must be that this context, just as when training word vectors, is carefully designed. This is what the preprocessing step is for: to generate a number of context examples for each character. \\
 
-    Exactly what this context should be is unclear; our hope is that taking sentences in which character names appear and extracting action verbs and direct objects will be sufficient for contexts. This might be accomplished by using NER and then matching simple sentences. If this proves insufficient, we can explore other possible contexts, taking into account quotes, or using a dependency parser to extract more detailed features for character-present sentences.
+    Exactly what this context should be is unclear; our hope is that taking sentences in which character names appear and extracting action verbs and direct objects will be sufficient for contexts. This might be accomplished by using NER and then matching simple sentences. If this proves insufficient, we can explore other possible contexts, taking into account dialogue, or using a dependency parser to extract more detailed features for character-present sentences.
 
-\subsubsection{Networks}
-    Each of these networks is trained across the entire dataset of novels obtained from data collection, though we train the character vector network before the other two, as they require semantic character representations as input.  \\
+\subsubsection{Neural Networks}
+    Each of these networks is trained across the entire dataset of novels obtained from data collection, though we train the character vector network before the other two, as they require semantic character representations as input. \\
 
     Our hypothesis is that a semantic character vector can be obtained for each character given context for the character's appearance in a novel, using the first network. Much as word vectors are trained by feeding in word-context pairs, we use this network to train character networks. Given that characters appear many times in these long novels, we believe there is adequate data for learning a representation. \\
 
-    Given output from the first network, the other two networks are similar to many current classification networks using word vectors as input. We feed in a singlet or pair of characters, and then obtain an output label corresponding to their literary role or relationship. To keep learning feasible, we restrict to a small subset of major literary role and prominent relationship labels. Since the training is done over all novels, we believe we will have enough data to perform adequate learning. \\
+    Given output from the first network, the other two networks are similar to many current classification networks using word vectors as input. We feed in a singlet or pair of characters, and then obtain an output label corresponding to their literary role or relationship. To keep learning feasible, we restrict to a small subset of major literary role and prominent relationship labels. Since the training is done over all novels, we believe we will have enough data to perform adequate learning. 
 
-    After we have passed the characters through the last two networks, we then have labels for each character and a list of labeled 2-character relationships. As described in the introduction, these labels then induce a graph structure that we can visualize. 
+\subsubsection{Execution}
+    To run the system on a new novel, we would first train character vectors for the novel by using the preprocessor and feeding the data into the trained character network. We would then use the already trained role and relation networks to generate the roles and relations for characters, giving us the character graph. 
 
-\subsection{Result Measuring}
+\subsection{Evaluation}
 \section{Milestones}
+    We plan to finish data collection before November 14, 2015, baseline before November 21, implementation of our approach before December 1, final report before December 11.
 
 \end{document}
